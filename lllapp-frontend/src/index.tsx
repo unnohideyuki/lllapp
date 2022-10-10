@@ -43,26 +43,40 @@ const renderRow = (param: FetchData, progress: number[]): JSX.Element => {
   }
 }
 
+type BookInfo = {
+  title : string
+  author : string
+  isbn : string
+}
+
 const ReadingRecord = () => {
   const params = useParams()
 
+  // Fetching TOC API
   const [datas, setDatas] = useState<FetchData[]>([])
   const urlTOC = `${backendBaseURL}/users/${params.id}/books/${params.num}/toc`
   useEffect(() => { axios.get(urlTOC).then((res) => setDatas(res.data))}, [])
 
+  // Fetching Progress API
   const [progress, setDatas2] = useState<number[]>([])
   const urlProgress = `${backendBaseURL}/users/${params.id}/books/${params.num}/pghistory`
   useEffect(() => { axios.get(urlProgress).then((res) => setDatas2(res.data))}, [])
 
+  // Fetching Info API
+  const [info, setDatas3] = useState<BookInfo>({title : "", author : "", isbn : ""})
+  const urlInfo = `${backendBaseURL}/users/${params.id}/books/${params.num}/info`
+  useEffect(() => { axios.get(urlInfo).then((res) => setDatas3(res.data))}, [])
+
   return (
     <div>
-      <div className="reading-record">
-        <div className="reading-record-info">
-          {/* todo */}
-        </div>
+      <div className="reading-record-info">
+        <ul className="book-info">
+          <li className="book-title">{info.title}</li>
+          <li>{info.author}</li>
+        </ul>
       </div>
       <div className="reading-record-table">
-        <table className="reading-record-table">
+        <table>
           <tbody>{datas.map((item: FetchData) => renderRow(item, progress))}</tbody>
         </table>
       </div>

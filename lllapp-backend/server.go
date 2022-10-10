@@ -2,6 +2,8 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"regexp"
@@ -124,11 +126,22 @@ func getPageProgress(c echo.Context) error {
 	return c.JSON(http.StatusOK, pghis)
 }
 
+func getBookInfo(c echo.Context) error {
+	id := c.Param("id")
+	num := c.Param("num")
+	fileName := data_dir + "/" + id + "/books/" + num + "/info.json"
+	bytes, _ := ioutil.ReadFile(fileName)
+	var jsonObj interface{}
+	_ = json.Unmarshal(bytes, &jsonObj)
+	return c.JSON(http.StatusOK, jsonObj)
+}
+
 func main() {
 	e := echo.New()
 
 	e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
 
+	e.GET("/users/:id/books/:num/info", getBookInfo)
 	e.GET("/users/:id/books/:num/toc", getBookToc)
 	e.GET("/users/:id/books/:num/pghistory", getPageProgress)
 	e.Logger.Fatal(e.Start(":8080"))
