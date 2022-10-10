@@ -33,7 +33,10 @@ func getBookToc(c echo.Context) error {
 	pageFrom := -1
 
 	for scanner.Scan() {
-		t := string(scanner.Text())
+		t := strings.TrimSpace(string(scanner.Text()))
+		if len(t) == 0 {
+			continue
+		}
 		if c := t[0:1]; c == "%" {
 			continue
 		}
@@ -60,7 +63,7 @@ func getBookToc(c echo.Context) error {
 			pageFrom = pg
 		}
 		if len(a) >= 2 {
-			titleName = strings.Trim(a[1], " ")
+			titleName = strings.Trim(a[1], " \t")
 		} else {
 			titleName = ""
 		}
