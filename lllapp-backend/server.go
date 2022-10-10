@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -76,11 +77,59 @@ func getBookToc(c echo.Context) error {
 	return c.JSON(http.StatusOK, toc)
 }
 
+func getPageProgress(c echo.Context) error {
+	id := c.Param("id")
+	num := c.Param("num")
+
+	fileName := data_dir + "/" + id + "/books/" + num + "/pghistory.txt"
+
+	fp, err := os.Open(fileName)
+	if err != nil {
+		panic(err)
+	}
+	defer fp.Close()
+
+	mp := map[int]int{}
+	scanner := bufio.NewScanner(fp)
+	pagemx := 0
+
+	for scanner.Scan() {
+		t := strings.TrimSpace(string(scanner.Text()))
+		if len(t) == 0 {
+			continue
+		}
+
+		re := regexp.MustCompile(`^(\d+)-(\d+)`)
+		a := re.FindStringSubmatch(t)
+
+		p0, _ := strconv.Atoi(a[1])
+		p1, _ := strconv.Atoi(a[2])
+
+		if p1 > pagemx {
+			pagemx = p1
+		}
+
+		for i := p0; i <= p1; i++ {
+			ct, _ := mp[i]
+			mp[i] = ct + 1
+		}
+	}
+
+	pghis := make([]int, pagemx+1)
+	for i := 0; i <= pagemx; i++ {
+		ct, _ := mp[i]
+		pghis[i] = ct
+	}
+
+	return c.JSON(http.StatusOK, pghis)
+}
+
 func main() {
 	e := echo.New()
 
 	e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
 
 	e.GET("/users/:id/books/:num/toc", getBookToc)
+	e.GET("/users/:id/books/:num/pghistory", getPageProgress)
 	e.Logger.Fatal(e.Start(":8080"))
 }

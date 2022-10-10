@@ -13,22 +13,20 @@ type FetchData = {
 }
 
 const renderSquare = (i: number | undefined): JSX.Element => {
-  let bg = '#fff'
-
   if (i == undefined) i = 0
-  if (i > 2) bg = '#fc7f00'
-  else if (i == 2) bg = '#ffbd00'
-  else if (i == 1) bg = '#e4ff7a'
-
-  const style = { background: bg }
+  if (i > 4) i = 4
+  const colors = ['#eeeeee', '#d6e685', '#8cc665', '#44a340', '#1e6823']
+  const style = { background: colors[i] }
 
   return <div className="square" style={style}></div>
 }
 
 const renderRow = (param: FetchData, progress: number[]): JSX.Element => {
   const pages = []
-  if (Number(param.page_from) >= 0) {
-    for (let i = Number(param.page_from); i <= Number(param.page_to); i++)
+  const p0 = Number(param.page_from)
+  const p1 = Math.max(p0, Number(param.page_to))
+  if (p0 >= 0) {
+    for (let i = p0; i <= p1; i++)
       pages.push(i)
     return (
       <tr>
@@ -39,19 +37,22 @@ const renderRow = (param: FetchData, progress: number[]): JSX.Element => {
   } else {
     return (
       <tr>
-        <td colSpan={2} className="part-name">
-          {param.name}
-        </td>
+        <td colSpan={2} className="part-name">{param.name}</td>
       </tr>
     )
   }
 }
 
 const ReadingRecord = () => {
-  const [datas, setDatas] = useState<FetchData[]>([])
   const params = useParams()
-  const urlAPI = `${backendBaseURL}/users/${params.id}/books/${params.num}/toc`
-  useEffect(() => { axios.get(urlAPI).then((res) => setDatas(res.data))}, [])
+
+  const [datas, setDatas] = useState<FetchData[]>([])
+  const urlTOC = `${backendBaseURL}/users/${params.id}/books/${params.num}/toc`
+  useEffect(() => { axios.get(urlTOC).then((res) => setDatas(res.data))}, [])
+
+  const [progress, setDatas2] = useState<number[]>([])
+  const urlProgress = `${backendBaseURL}/users/${params.id}/books/${params.num}/pghistory`
+  useEffect(() => { axios.get(urlProgress).then((res) => setDatas2(res.data))}, [])
 
   return (
     <div>
@@ -62,7 +63,7 @@ const ReadingRecord = () => {
       </div>
       <div className="reading-record-table">
         <table className="reading-record-table">
-          <tbody>{datas.map((item: FetchData) => renderRow(item, []))}</tbody>
+          <tbody>{datas.map((item: FetchData) => renderRow(item, progress))}</tbody>
         </table>
       </div>
     </div>
