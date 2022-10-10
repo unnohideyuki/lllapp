@@ -26,8 +26,7 @@ const renderRow = (param: FetchData, progress: number[]): JSX.Element => {
   const p0 = Number(param.page_from)
   const p1 = Math.max(p0, Number(param.page_to))
   if (p0 >= 0) {
-    for (let i = p0; i <= p1; i++)
-      pages.push(i)
+    for (let i = p0; i <= p1; i++) pages.push(i)
     return (
       <tr>
         <td className="section-name">{param.name}</td>
@@ -37,16 +36,18 @@ const renderRow = (param: FetchData, progress: number[]): JSX.Element => {
   } else {
     return (
       <tr>
-        <td colSpan={2} className="part-name">{param.name}</td>
+        <td colSpan={2} className="part-name">
+          {param.name}
+        </td>
       </tr>
     )
   }
 }
 
 type BookInfo = {
-  title : string
-  author : string
-  isbn : string
+  title: string
+  author: string
+  isbn: string
 }
 
 const ReadingRecord = () => {
@@ -55,17 +56,27 @@ const ReadingRecord = () => {
   // Fetching TOC API
   const [datas, setDatas] = useState<FetchData[]>([])
   const urlTOC = `${backendBaseURL}/users/${params.id}/books/${params.num}/toc`
-  useEffect(() => { axios.get(urlTOC).then((res) => setDatas(res.data))}, [])
+  useEffect(() => {
+    axios.get(urlTOC).then((res) => setDatas(res.data))
+  }, [])
 
   // Fetching Progress API
   const [progress, setDatas2] = useState<number[]>([])
   const urlProgress = `${backendBaseURL}/users/${params.id}/books/${params.num}/pghistory`
-  useEffect(() => { axios.get(urlProgress).then((res) => setDatas2(res.data))}, [])
+  useEffect(() => {
+    axios.get(urlProgress).then((res) => setDatas2(res.data))
+  }, [])
 
   // Fetching Info API
-  const [info, setDatas3] = useState<BookInfo>({title : "", author : "", isbn : ""})
+  const [info, setDatas3] = useState<BookInfo>({
+    title: '',
+    author: '',
+    isbn: '',
+  })
   const urlInfo = `${backendBaseURL}/users/${params.id}/books/${params.num}/info`
-  useEffect(() => { axios.get(urlInfo).then((res) => setDatas3(res.data))}, [])
+  useEffect(() => {
+    axios.get(urlInfo).then((res) => setDatas3(res.data))
+  }, [])
 
   return (
     <div>
@@ -77,7 +88,9 @@ const ReadingRecord = () => {
       </div>
       <div className="reading-record-table">
         <table>
-          <tbody>{datas.map((item: FetchData) => renderRow(item, progress))}</tbody>
+          <tbody>
+            {datas.map((item: FetchData) => renderRow(item, progress))}
+          </tbody>
         </table>
       </div>
     </div>
@@ -92,7 +105,10 @@ if (container) {
   root.render(
     <BrowserRouter>
       <Routes>
-        <Route path="/users/:id/books/:num/progress" element={<ReadingRecord />} />
+        <Route
+          path="/users/:id/books/:num/progress"
+          element={<ReadingRecord />}
+        />
       </Routes>
     </BrowserRouter>
   )
