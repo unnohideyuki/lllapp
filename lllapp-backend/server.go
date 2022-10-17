@@ -3,12 +3,15 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -136,6 +139,30 @@ func getBookInfo(c echo.Context) error {
 	return c.JSON(http.StatusOK, jsonObj)
 }
 
+func postPages(c echo.Context) error {
+	id := c.Param("id")
+	num := c.Param("num")
+	fileName := data_dir + "/" + id + "/books/" + num + "/pghistory.txt"
+
+	pgFrom, _ := strconv.Atoi(c.FormValue("pgfrom"))
+	pgTo, _ := strconv.Atoi(c.FormValue("pgto"))
+	if pgTo < pgFrom {
+		pgTo = pgFrom
+	}
+
+	// TODO : file lock, syscall 系を使うので pghistory とは別にロックファイルを作るか？
+
+	fp, err := os.OpenFile(fileName, os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer fp.Close()
+
+	fmt.Fprintf(fp, "%d-%d, %s\n", pgFrom, pgTo, time.Now())
+
+	return c.String(http.StatusOK, "postPages ok :"+id+", "+num+", ("+c.FormValue("pgfrom")+")-("+c.FormValue("pgto")+")")
+}
+
 func main() {
 	e := echo.New()
 
@@ -144,5 +171,7 @@ func main() {
 	e.GET("/users/:id/books/:num/info", getBookInfo)
 	e.GET("/users/:id/books/:num/toc", getBookToc)
 	e.GET("/users/:id/books/:num/pghistory", getPageProgress)
+	e.POST("/users/:id/books/:num/postpages", postPages)
+
 	e.Logger.Fatal(e.Start(":8080"))
 }

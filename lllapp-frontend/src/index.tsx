@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { FC, useState, useEffect } from 'react'
 import axios from 'axios'
 import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom'
 import { createRoot } from 'react-dom/client'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import './index.css'
+import { isRegularExpressionLiteral } from 'typescript'
+import { NavLink } from 'react-router-dom'
 
 const backendBaseURL = 'http://localhost:8080'
 
@@ -44,6 +47,11 @@ const renderRow = (param: FetchData, progress: number[]): JSX.Element => {
   }
 }
 
+type FormData = {
+  pgfrom: string
+  pgto: string
+}
+
 type BookInfo = {
   title: string
   author: string
@@ -78,6 +86,17 @@ const ReadingRecord = () => {
     axios.get(urlInfo).then((res) => setDatas3(res.data))
   }, [])
 
+  const urlPostPages = `${backendBaseURL}/users/${params.id}/books/${params.num}/postpages`
+  const { handleSubmit, register, reset } = useForm<FormData>()
+
+  const postPages: SubmitHandler<FormData> = (data) => {
+    console.log(data)
+    const params = new URLSearchParams(data)
+    axios.post(urlPostPages, params).then(res => {console.log(res)}).catch((e) => {console.error(e)})
+    reset()
+    window.location.reload()
+  }
+
   return (
     <div>
       <div className="reading-record-info">
@@ -85,6 +104,13 @@ const ReadingRecord = () => {
           <li className="book-title">{info.title}</li>
           <li>{info.author}</li>
         </ul>
+      </div>
+      <div>
+        <form onSubmit={handleSubmit(postPages)}>
+          <input type="number" {...register('pgfrom')} placeholder="page from" />
+          <input type="number" {...register('pgto')} placeholder="page to" />
+          <button type="submit" >Send</button>
+        </form>
       </div>
       <div className="reading-record-table">
         <table>
