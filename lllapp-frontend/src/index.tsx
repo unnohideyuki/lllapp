@@ -1,11 +1,9 @@
-import React, { FC, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom'
 import { createRoot } from 'react-dom/client'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import './index.css'
-import { isRegularExpressionLiteral } from 'typescript'
-import { NavLink } from 'react-router-dom'
 
 const backendBaseURL = 'http://localhost:8080'
 
@@ -58,7 +56,15 @@ type BookInfo = {
   isbn: string
 }
 
+interface PanelState {
+  mode: number
+}
+
 const ReadingRecord = () => {
+  const [panelState, setPanelState] = useState<PanelState>({
+    mode: 0,
+  })
+
   const params = useParams()
 
   // Fetching TOC API
@@ -92,9 +98,52 @@ const ReadingRecord = () => {
   const postPages: SubmitHandler<FormData> = (data) => {
     console.log(data)
     const params = new URLSearchParams(data)
-    axios.post(urlPostPages, params).then(res => {console.log(res)}).catch((e) => {console.error(e)})
+    axios
+      .post(urlPostPages, params)
+      .then((res) => {
+        console.log(res)
+      })
+      .catch((e) => {
+        console.error(e)
+      })
     reset()
     window.location.reload()
+  }
+
+  const changeMode = (x: number) => {
+    setPanelState({ ...panelState, mode: x })
+  }
+
+  const renderPanel = () => {
+    if (panelState.mode == 1) {
+      return (
+        <form onSubmit={handleSubmit(postPages)}>
+          <div>
+            <button type="button" onClick={() => changeMode(0)}>
+              ✖️
+            </button>
+            <span>読んだページを入力：</span>
+            <input
+              type="number"
+              {...register('pgfrom')}
+              placeholder="page from"
+            />
+            <span>-</span>
+            <input type="number" {...register('pgto')} placeholder="page to" />
+            <button type="submit">Send</button>
+          </div>
+        </form>
+      )
+    } else {
+      return (
+        <form>
+          <button type="button" onClick={() => changeMode(1)}>
+            ＋
+          </button>
+          <span>最後に読んだページをここに表示する（未実装）</span>
+        </form>
+      )
+    }
   }
 
   return (
@@ -105,13 +154,7 @@ const ReadingRecord = () => {
           <li>{info.author}</li>
         </ul>
       </div>
-      <div>
-        <form onSubmit={handleSubmit(postPages)}>
-          <input type="number" {...register('pgfrom')} placeholder="page from" />
-          <input type="number" {...register('pgto')} placeholder="page to" />
-          <button type="submit" >Send</button>
-        </form>
-      </div>
+      <div className="reading-record-panel">{renderPanel()}</div>
       <div className="reading-record-table">
         <table>
           <tbody>
