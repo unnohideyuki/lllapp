@@ -110,6 +110,13 @@ const ReadingRecord = () => {
     window.location.reload()
   }
 
+  // Fetching Last-Read pages
+  const [lastpg, setDatas4] = useState<string[]>([])
+  const urlLastRead = `${backendBaseURL}/users/${params.id}/books/${params.num}/lastread`
+  useEffect(() => {
+    axios.get(urlLastRead).then((res) => setDatas4(res.data))
+  }, [])
+
   const changeMode = (x: number) => {
     setPanelState({ ...panelState, mode: x })
   }
@@ -130,17 +137,21 @@ const ReadingRecord = () => {
             />
             <span>-</span>
             <input type="number" {...register('pgto')} placeholder="page to" />
+            <span></span>
             <button type="submit">Send</button>
           </div>
         </form>
       )
     } else {
+      // TODO: まだ１ページも読んでいない場合の対処
       return (
         <form>
           <button type="button" onClick={() => changeMode(1)}>
             ＋
           </button>
-          <span>最後に読んだページをここに表示する（未実装）</span>
+          <span>
+            最後に読んだページ： page {lastpg[0]} - {lastpg[1]}（{lastpg[2]}）
+          </span>
         </form>
       )
     }

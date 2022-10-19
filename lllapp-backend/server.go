@@ -82,6 +82,41 @@ func getBookToc(c echo.Context) error {
 	return c.JSON(http.StatusOK, toc)
 }
 
+func getLastRead(c echo.Context) error {
+	id := c.Param("id")
+	num := c.Param("num")
+
+	fileName := data_dir + "/" + id + "/books/" + num + "/pghistory.txt"
+
+	fp, err := os.Open(fileName)
+	if err != nil {
+		panic(err)
+	}
+	defer fp.Close()
+
+	scanner := bufio.NewScanner(fp)
+
+	var p0 string
+	var p1 string
+	var d string
+
+	for scanner.Scan() {
+		t := strings.TrimSpace(string(scanner.Text()))
+		if len(t) == 0 {
+			continue
+		}
+
+		re := regexp.MustCompile(`^(\d+)-(\d+),\s+([\d\-]+)`)
+		a := re.FindStringSubmatch(t)
+
+		p0 = a[1]
+		p1 = a[2]
+		d = a[3]
+	}
+
+	return c.JSON(http.StatusOK, []string{p0, p1, d})
+}
+
 func getPageProgress(c echo.Context) error {
 	id := c.Param("id")
 	num := c.Param("num")
@@ -171,6 +206,7 @@ func main() {
 	e.GET("/users/:id/books/:num/info", getBookInfo)
 	e.GET("/users/:id/books/:num/toc", getBookToc)
 	e.GET("/users/:id/books/:num/pghistory", getPageProgress)
+	e.GET("/users/:id/books/:num/lastread", getLastRead)
 	e.POST("/users/:id/books/:num/postpages", postPages)
 
 	e.Logger.Fatal(e.Start(":8080"))
