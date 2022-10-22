@@ -98,14 +98,16 @@ const ReadingRecord = () => {
   const postPages: SubmitHandler<FormData> = (data) => {
     console.log(data)
     const params = new URLSearchParams(data)
-    axios
-      .post(urlPostPages, params)
-      .then((res) => {
-        console.log(res)
-      })
-      .catch((e) => {
-        console.error(e)
-      })
+    if (data.pgfrom != '') {
+      axios
+        .post(urlPostPages, params)
+        .then((res) => {
+          console.log(res)
+        })
+        .catch((e) => {
+          console.error(e)
+        })
+    }
     reset()
     window.location.reload()
   }
@@ -126,19 +128,21 @@ const ReadingRecord = () => {
       return (
         <form onSubmit={handleSubmit(postPages)}>
           <div>
-            <button className="circleButtonGray" type="button" onClick={() => changeMode(0)}>
+            <button
+              className="circleButtonGray"
+              type="button"
+              onClick={() => changeMode(0)}
+            >
               ×
             </button>
             <span>読んだページを入力：</span>
-            <input
-              type="number"
-              {...register('pgfrom')}
-              placeholder="from"
-            />
+            <input type="number" {...register('pgfrom')} placeholder="from" />
             <span>-</span>
             <input type="number" {...register('pgto')} placeholder="to" />
             <span></span>
-            <button className="normalButton" type="submit">記録する</button>
+            <button className="normalButton" type="submit">
+              記録する
+            </button>
           </div>
         </form>
       )
@@ -146,7 +150,11 @@ const ReadingRecord = () => {
       // TODO: まだ１ページも読んでいない場合の対処
       return (
         <form>
-          <button className="circleButton" type="button" onClick={() => changeMode(1)}>
+          <button
+            className="circleButton"
+            type="button"
+            onClick={() => changeMode(1)}
+          >
             ＋
           </button>
           <span>
