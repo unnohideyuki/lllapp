@@ -126,19 +126,19 @@ const ReadingRecord = () => {
       return (
         <form onSubmit={handleSubmit(postPages)}>
           <div>
-            <button type="button" onClick={() => changeMode(0)}>
-              ✖️
+            <button className="circleButtonGray" type="button" onClick={() => changeMode(0)}>
+              ×
             </button>
             <span>読んだページを入力：</span>
             <input
               type="number"
               {...register('pgfrom')}
-              placeholder="page from"
+              placeholder="from"
             />
             <span>-</span>
-            <input type="number" {...register('pgto')} placeholder="page to" />
+            <input type="number" {...register('pgto')} placeholder="to" />
             <span></span>
-            <button type="submit">Send</button>
+            <button className="normalButton" type="submit">記録する</button>
           </div>
         </form>
       )
@@ -146,7 +146,7 @@ const ReadingRecord = () => {
       // TODO: まだ１ページも読んでいない場合の対処
       return (
         <form>
-          <button type="button" onClick={() => changeMode(1)}>
+          <button className="circleButton" type="button" onClick={() => changeMode(1)}>
             ＋
           </button>
           <span>

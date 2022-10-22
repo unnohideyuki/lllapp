@@ -63,3 +63,35 @@ span {
   margin-left: 10px;
   margin-right: 10px;
 }
+
+.normalButton {
+  border: none;
+  color: white;
+  background-color: #7eb93a;
+  border-radius: 5%;
+  height: 24px;
+  padding-left: 10px;
+  padding-right: 10px;
+} 
+
+.circleButton {
+  border: none;
+  color: white;
+  background-color: #7eb93a;
+  height: 40px;
+  width: 40px;
+  font-size: 24px;
+  font-weight: bold;
+  border-radius: 50%;
+} 
+
+.circleButtonGray {
+  border: none;
+  color: white;
+  background-color: gray;
+  height: 40px;
+  width: 40px;
+  font-size: 24px;
+  font-weight: bold;
+  border-radius: 50%;
+} 
