@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { SubmitHandler, useForm } from 'react-hook-form'
 
 import './index.css'
@@ -51,9 +51,9 @@ type FormData = {
 }
 
 type BookInfo = {
-  title: string
-  author: string
-  isbn: string
+  Title: string
+  Author: string
+  Isbn: string
 }
 
 interface PanelState {
@@ -83,9 +83,9 @@ const ReadingRecord = () => {
 
   // Fetching Info API
   const [info, setDatas3] = useState<BookInfo>({
-    title: '',
-    author: '',
-    isbn: '',
+    Title: '',
+    Author: '',
+    Isbn: '',
   })
   const urlInfo = `${backendBaseURL}/users/${params.id}/books/${params.num}/info`
   useEffect(() => {
@@ -169,8 +169,8 @@ const ReadingRecord = () => {
     <div>
       <div className="reading-record-info">
         <ul className="book-info">
-          <li className="book-title">{info.title}</li>
-          <li>{info.author}</li>
+          <li className="book-title">{info.Title}</li>
+          <li>{info.Author}</li>
         </ul>
       </div>
       <div className="reading-record-panel">{renderPanel()}</div>
@@ -185,4 +185,4 @@ const ReadingRecord = () => {
   )
 }
 
-export default ReadingRecord;
+export default ReadingRecord

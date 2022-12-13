@@ -7,13 +7,13 @@ import './index.css'
 const backendBaseURL = 'http://localhost:8080'
 
 const UserPage = () => {
-    const params = useParams()
+  const params = useParams()
 
-    return (
-        <div>
-            <h1>{params.id}</h1>
-        </div>
-    )
+  return (
+    <div>
+      <h1>{params.id}</h1>
+    </div>
+  )
 }
 
-export default UserPage;
+export default UserPage
