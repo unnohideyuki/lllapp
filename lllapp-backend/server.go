@@ -4,10 +4,12 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -164,13 +166,23 @@ func getPageProgress(c echo.Context) error {
 	return c.JSON(http.StatusOK, pghis)
 }
 
+type BookInfo struct {
+	Num     string
+	Title   string
+	Author  string
+	Isbn    string
+	ModTime string
+}
+
 func getBookInfo(c echo.Context) error {
 	id := c.Param("id")
 	num := c.Param("num")
 	fileName := data_dir + "/" + id + "/books/" + num + "/info.json"
 	bytes, _ := ioutil.ReadFile(fileName)
-	var jsonObj interface{}
+	var jsonObj BookInfo
 	_ = json.Unmarshal(bytes, &jsonObj)
+	jsonObj.Num = num
+	// ModTime is not set
 	return c.JSON(http.StatusOK, jsonObj)
 }
 
@@ -193,15 +205,56 @@ func postPages(c echo.Context) error {
 	}
 	defer fp.Close()
 
-	fmt.Fprintf(fp, "%d-%d, %s\n", pgFrom, pgTo, time.Now())
+	fmt.Fprintf(fp, "%d-%d, %s\n", pgFrom, pgTo, time.Now().Format(time.RFC3339))
 
 	return c.String(http.StatusOK, "postPages ok :"+id+", "+num+", ("+c.FormValue("pgfrom")+")-("+c.FormValue("pgto")+")")
+}
+
+func getBookList(c echo.Context) error {
+	id := c.Param("id")
+	dirName := data_dir + "/" + id + "/books"
+
+	dirs, err := ioutil.ReadDir(dirName)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var data []interface{}
+	var files []string
+
+	for _, dir := range dirs {
+		if dir.IsDir() {
+			fileName := filepath.Join(dirName, dir.Name(), "/info.json")
+			bytes, _ := ioutil.ReadFile(fileName)
+			var i BookInfo
+			err = json.Unmarshal(bytes, &i)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			fileSystem := os.DirFS(filepath.Join(dirName, dir.Name()))
+			rlogFileName := "pghistory.txt"
+			fi, err := fs.Stat(fileSystem, rlogFileName)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			i.ModTime = fi.ModTime().Format(time.RFC3339)
+			i.Num = dir.Name()
+			data = append(data, i)
+			files = append(files, fileName)
+		}
+	}
+
+	return c.JSON(http.StatusOK, data)
 }
 
 func main() {
 	e := echo.New()
 
 	e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
+
+	e.GET("/users/:id/books/list", getBookList)
 
 	e.GET("/users/:id/books/:num/info", getBookInfo)
 	e.GET("/users/:id/books/:num/toc", getBookToc)
