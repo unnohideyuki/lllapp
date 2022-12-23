@@ -164,11 +164,11 @@ func GetPageProgress(c echo.Context) error {
 }
 
 type BookInfo struct {
-	Num     string
-	Title   string
-	Author  string
-	Isbn    string
-	ModTime string
+	Num     string `json:"num"`
+	Title   string `json:"title"`
+	Author  string `json:"author"`
+	Isbn    string `json:"isbn"`
+	ModTime string `json:"modtime"`
 }
 
 func GetBookInfo(c echo.Context) error {

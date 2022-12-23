@@ -51,9 +51,9 @@ type FormData = {
 }
 
 type BookInfo = {
-  Title: string
-  Author: string
-  Isbn: string
+  title: string
+  author: string
+  isbn: string
 }
 
 interface PanelState {
@@ -83,9 +83,9 @@ const ReadingRecord = () => {
 
   // Fetching Info API
   const [info, setDatas3] = useState<BookInfo>({
-    Title: '',
-    Author: '',
-    Isbn: '',
+    title: '',
+    author: '',
+    isbn: '',
   })
   const urlInfo = `${backendBaseURL}/users/${params.id}/books/${params.num}/info`
   useEffect(() => {
@@ -169,8 +169,8 @@ const ReadingRecord = () => {
     <div>
       <div className="reading-record-info">
         <ul className="book-info">
-          <li className="book-title">{info.Title}</li>
-          <li>{info.Author}</li>
+          <li className="book-title">{info.title}</li>
+          <li>{info.author}</li>
         </ul>
       </div>
       <div className="reading-record-panel">{renderPanel()}</div>
