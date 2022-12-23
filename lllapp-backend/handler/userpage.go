@@ -15,8 +15,19 @@ import (
 	"lllapp-backend/config"
 )
 
-//func GetUserSummary(c echo.Context) error {
-//}
+func GetUserSummary(c echo.Context) error {
+	id := c.Param("id")
+	dirName := config.DataDir + "/" + id + "/books"
+
+	_, err := ioutil.ReadDir(dirName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	dat := make(map[string]string)
+	dat["username"] = id
+
+	return c.JSON(http.StatusOK, dat)
+}
 
 func GetBookList(c echo.Context) error {
 	id := c.Param("id")

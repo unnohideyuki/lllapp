@@ -9,7 +9,7 @@ import (
 func Register(g *echo.Group) {
 	users := g.Group("/users")
 	// for User Page
-	//users.GET("/:id/summary", h.GetUserSummary)
+	users.GET("/:id/summary", h.GetUserSummary)
 	users.GET("/:id/books/list", h.GetBookList)
 
 	// for Reading Record
